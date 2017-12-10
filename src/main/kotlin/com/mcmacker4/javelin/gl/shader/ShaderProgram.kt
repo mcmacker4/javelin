@@ -1,14 +1,16 @@
 package com.mcmacker4.javelin.gl.shader
 
-import com.mcmacker4.javelin.gl.GLObject
-import com.mcmacker4.javelin.readFile
+import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20.*
+import java.nio.FloatBuffer
 
 
 class ShaderProgram(private val vertexShader: Shader, private val fragmentShader: Shader) {
     
-    val id: Int = glCreateProgram()
+    private val id: Int = glCreateProgram()
+    
+    private val uniformLocations = hashMapOf<String, Int>()
     
     constructor(vSource: String, fSource: String)
             : this(Shader(vSource, Shader.VERTEX), Shader(fSource, Shader.FRAGMENT))
@@ -27,12 +29,20 @@ class ShaderProgram(private val vertexShader: Shader, private val fragmentShader
             throw Exception(glGetProgramInfoLog(id))
     }
 
-    fun use() {
+    fun start() {
         glUseProgram(id)
     }
 
     fun stop() {
         glUseProgram(0)
+    }
+    
+    fun loadUniformMat4(name: String, matrix: FloatBuffer) {
+        val location = uniformLocations[name] ?: glGetUniformLocation(id, name)
+        if(location != -1) {
+            uniformLocations[name] = location
+            glUniformMatrix4fv(location, false, matrix)
+        }
     }
 
     fun delete() {
@@ -41,14 +51,4 @@ class ShaderProgram(private val vertexShader: Shader, private val fragmentShader
         glDeleteProgram(id)
     }
     
-    companion object {
-        
-        fun load(name: String) : ShaderProgram {
-            val vertexSource = readFile("shaders/$name.v.glsl")
-            val fragmentSource = readFile("shaders/$name.f.glsl")
-            return ShaderProgram(vertexSource, fragmentSource)
-        }
-        
-    }
-
 }

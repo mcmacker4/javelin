@@ -1,5 +1,7 @@
 package com.mcmacker4.javelin.display
 
+import com.mcmacker4.javelin.input.Keyboard
+import com.mcmacker4.javelin.input.Mouse
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.opengl.GL
@@ -15,6 +17,8 @@ class Display(
     
     val window: Long
     
+    private val resizeListeners: ArrayList<(Int, Int) -> Unit> = arrayListOf()
+    
     init {
         
         //Set Properties
@@ -26,28 +30,46 @@ class Display(
         if(window == NULL)
             throw IllegalStateException("Could not create Window.")
         
-        //Center window on screen
-        val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-        glfwSetWindowPos(
-                window,
-                (vidmode.width() - width) / 2,
-                (vidmode.height() - height) / 2
-        )
-        
-        glfwSetWindowSizeCallback(window) { _, width, height ->
-            this.width = width
-            this.height = height
+        //If it's the primary window (not shared)
+        if(share == null) {
+
+            //Center window on screen
+            val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+            glfwSetWindowPos(
+                    window,
+                    (vidmode.width() - width) / 2,
+                    (vidmode.height() - height) / 2
+            )
+
+            glfwMakeContextCurrent(window)
+            glfwShowWindow(window)
+
+            GL.createCapabilities()
+
+            glfwSetWindowSizeCallback(window) { _, width, height ->
+                this.width = width
+                this.height = height
+
+                glViewport(0, 0, width, height)
+                
+                resizeListeners.forEach { it(width, height) }
+            }
+            
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+            
+            glfwSetCursorPos(window, width / 2.0, height / 2.0)
+            
+            glfwSwapInterval(0)
+            
+            glfwSetKeyCallback(window, Keyboard::keyboardCallback)
+            glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback)
+            glfwSetCursorPosCallback(window, Mouse::mousePosCallback)
+
             glViewport(0, 0, width, height)
+
+            glClearColor(0.3f, 0.6f, 0.9f, 1.0f)
+
         }
-        
-        glfwMakeContextCurrent(window)
-        glfwShowWindow(window)
-        
-        GL.createCapabilities()
-        
-        glViewport(0, 0, width, height)
-        
-        glClearColor(0.3f, 0.6f, 0.9f, 1.0f)
         
     }
     
@@ -65,5 +87,9 @@ class Display(
     }
 
     fun willClose() = glfwWindowShouldClose(window)
+    
+    fun onResize(listener: (Int, Int) -> Unit) {
+        resizeListeners.add(listener)
+    }
 
 }
