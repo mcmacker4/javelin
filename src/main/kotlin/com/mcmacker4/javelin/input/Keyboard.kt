@@ -1,6 +1,6 @@
 package com.mcmacker4.javelin.input
 
-import org.lwjgl.glfw.GLFW.GLFW_RELEASE
+import org.lwjgl.glfw.GLFW.*
 
 
 object Keyboard {
@@ -26,11 +26,12 @@ object Keyboard {
         keyUpListeners.remove(listener)
     }
     
+    @Suppress("UNUSED_PARAMETER")
     fun keyboardCallback(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
         if(action == GLFW_RELEASE) {
             keys[key] = false
             keyUpListeners.forEach { it(key, mods) }
-        } else {
+        } else if(action == GLFW_PRESS) {
             keys[key] = true
             keyDownListeners.forEach { it(key, mods) }
         }

@@ -1,6 +1,5 @@
 package com.mcmacker4.javelin.gl.shader
 
-import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20.*
 import java.nio.FloatBuffer

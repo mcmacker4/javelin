@@ -12,10 +12,13 @@ import org.lwjgl.system.MemoryUtil.NULL
 class Display(
         var width: Int,
         var height: Int,
-        var title: String,
+        title: String,
         share: Display? = null) {
     
     val window: Long
+    
+    var aspect: Float = width / height.toFloat()
+        get() { return width / height.toFloat() }
     
     private val resizeListeners: ArrayList<(Int, Int) -> Unit> = arrayListOf()
     
@@ -32,6 +35,8 @@ class Display(
         
         //If it's the primary window (not shared)
         if(share == null) {
+            
+            Display.MAIN = this
 
             //Center window on screen
             val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
@@ -90,6 +95,10 @@ class Display(
     
     fun onResize(listener: (Int, Int) -> Unit) {
         resizeListeners.add(listener)
+    }
+    
+    companion object {
+        lateinit var MAIN: Display
     }
 
 }

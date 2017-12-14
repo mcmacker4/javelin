@@ -1,4 +1,4 @@
-package com.mcmacker4.javelin
+package com.mcmacker4.testgame
 
 import com.mcmacker4.javelin.display.Display
 import com.mcmacker4.javelin.gl.shader.ShaderProgram
@@ -6,16 +6,16 @@ import com.mcmacker4.javelin.graphics.Camera
 import com.mcmacker4.javelin.input.Keyboard
 import com.mcmacker4.javelin.model.Model
 import com.mcmacker4.javelin.model.ModelLoader
-import com.mcmacker4.javelin.model.Renderer
+import com.mcmacker4.javelin.graphics.RendererOld
+import com.mcmacker4.javelin.model.Entity
 import com.mcmacker4.javelin.util.Resources
-import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL11.*
 
-
-class Javelin {
+@Deprecated("Old")
+class JavelinOld {
     
     private val display: Display
     
@@ -27,10 +27,10 @@ class Javelin {
         0.5f, -0.5f, 0.0f,
         0.5f, 0.5f, 0.0f
     )
-    
+
     private val model: Model
     private val camera: Camera
-    private val renderer: Renderer
+    private val rendererOld: RendererOld
     private val shaderProgram: ShaderProgram
     
     init {
@@ -58,8 +58,35 @@ class Javelin {
         
         display.onResize { width, height -> camera.aspect = width / height.toFloat() }
         
+        Keyboard.onKeyDown { key, _ ->  
+            if(key == GLFW_KEY_ESCAPE) stop()
+        }
+        
         //Renderer
-        renderer = Renderer(shaderProgram, camera)
+        rendererOld = RendererOld(shaderProgram, camera)
+        
+        glEnable(GL_DEPTH_TEST)
+
+        //Create Entities
+        for(i in 0 until 100) {
+            val entity = Entity(model)
+//            entity.setPosition(
+//                    (Math.random().toFloat() - 0.5f) * 10,
+//                    (Math.random().toFloat() - 0.5f) * 10,
+//                    (Math.random().toFloat() - 0.5f) * 10
+//            )
+//            entity.setRotation(
+//                    (Math.random() * Math.PI).toFloat(),
+//                    (Math.random()* Math.PI).toFloat(),
+//                    (Math.random()* Math.PI).toFloat()
+//            )
+//            entity.setScale(
+//                    Math.random().toFloat() + 0.5f,
+//                    Math.random().toFloat() + 0.5f,
+//                    Math.random().toFloat() + 0.5f
+//            )
+            rendererOld.addEntity(entity)
+        }
         
     }
     
@@ -69,7 +96,7 @@ class Javelin {
         var lastFPS = glfwGetTime()
         var frameCount = 0
         
-        while(!display.willClose() && !Keyboard.isKeyDown(GLFW_KEY_ESCAPE)) {
+        while(!display.willClose()) {
             
             val now = glfwGetTime()
             val delta = (now - lastTime).toFloat()
@@ -86,7 +113,7 @@ class Javelin {
             
             camera.update(delta)
             
-            renderer.draw(model)
+            rendererOld.draw()
             
             display.update()
             glfwPollEvents()

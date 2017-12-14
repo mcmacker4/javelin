@@ -5,14 +5,6 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 
 
-//Float Extensions
-
-fun Float.clamp(min: Float, max: Float) : Float {
-    if(this < min) return min
-    if(this > max) return max
-    return this
-}
-
 operator fun Quaternionf.not() : Quaternionf {
     return Quaternionf(-this.x, -this.y, -this.z, this.w)
 }

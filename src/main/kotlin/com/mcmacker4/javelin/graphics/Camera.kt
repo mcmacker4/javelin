@@ -2,6 +2,7 @@ package com.mcmacker4.javelin.graphics
 
 import com.mcmacker4.javelin.input.Keyboard
 import com.mcmacker4.javelin.input.Mouse
+import com.mcmacker4.javelin.util.plus
 import com.mcmacker4.javelin.util.times
 import com.mcmacker4.javelin.util.unaryMinus
 import org.joml.Matrix4f
@@ -10,7 +11,7 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
 
-
+@Deprecated("Old Camera")
 class Camera(
         private val position: Vector3f,
         private val rotation: Vector3f,
@@ -46,21 +47,36 @@ class Camera(
     val matrix: Matrix4f = Matrix4f()
     val matrixBuffer: FloatBuffer = MemoryUtil.memAllocFloat(4*4)
     
+    private val speed = Vector3f()
     private val sensitivity = 0.005f
     
     init {
-        updateMatrix()
+        //Mouse movement
         Mouse.onMove { x, y ->
-            rotation.x += -y.toFloat() * sensitivity
-            rotation.y += -x.toFloat() * sensitivity
-            updateMatrix()
+            rotate((-y * sensitivity).toFloat(), (-x * sensitivity).toFloat(), 0f)
         }
-        Keyboard.onKeyDown { key, mods ->
-            if(key == GLFW_KEY_Q) {
-                rotation.set(0f)
-                updateMatrix()
+        //Keyboard input
+        Keyboard.onKeyDown { key, _ ->
+            when(key) {
+                GLFW_KEY_A -> speed.x -= 1.0f
+                GLFW_KEY_D -> speed.x += 1.0f
+                GLFW_KEY_W -> speed.z -= 1.0f
+                GLFW_KEY_S -> speed.z += 1.0f
+                GLFW_KEY_LEFT_SHIFT -> speed.y -= 1.0f
+                GLFW_KEY_SPACE -> speed.y += 1.0f
             }
         }
+        Keyboard.onKeyUp { key, _ ->
+            when(key) {
+                GLFW_KEY_A -> speed.x += 1.0f
+                GLFW_KEY_D -> speed.x -= 1.0f
+                GLFW_KEY_W -> speed.z += 1.0f
+                GLFW_KEY_S -> speed.z -= 1.0f
+                GLFW_KEY_LEFT_SHIFT -> speed.y += 1.0f
+                GLFW_KEY_SPACE -> speed.y -= 1.0f
+            }
+        }
+        updateMatrix()
     }
     
     fun move(delta: Vector3f) {
@@ -68,9 +84,10 @@ class Camera(
         updateMatrix()
     }
 
-    fun move(dx: Float, dy: Float) {
+    fun move(dx: Float, dy: Float, dz: Float) {
         position.x += dx
         position.y += dy
+        position.z += dz
         updateMatrix()
     }
     
@@ -86,6 +103,7 @@ class Camera(
     
     fun rotate(x: Float, y: Float, z: Float) {
         rotation.add(x, y, z)
+        updateMatrix()
     }
 
     fun setRotation(rotation: Vector3f) {
@@ -122,15 +140,9 @@ class Camera(
     }
     
     fun update(delta: Float) {
-        val posDelta = Vector3f()
-        if(Keyboard.isKeyDown(GLFW_KEY_D)) posDelta.add(rightVector())
-        if(Keyboard.isKeyDown(GLFW_KEY_A)) posDelta.add(-rightVector())
-        if(Keyboard.isKeyDown(GLFW_KEY_W)) posDelta.add(forwardVector())
-        if(Keyboard.isKeyDown(GLFW_KEY_S)) posDelta.add(-forwardVector())
-        if(Keyboard.isKeyDown(GLFW_KEY_SPACE)) posDelta.add(upVector())
-        if(Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) posDelta.add(-upVector())
-        if(posDelta.x != 0f || posDelta.y != 0f || posDelta.z != 0f)
-            move(posDelta.mul(delta))
+        val deltaPos = Vector3f(speed).rotateY(rotation.y)
+        if(deltaPos.length() > 0) deltaPos.normalize()
+        move(deltaPos * delta)
     }
 
 }

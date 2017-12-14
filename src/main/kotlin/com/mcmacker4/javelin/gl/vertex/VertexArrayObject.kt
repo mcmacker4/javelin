@@ -43,4 +43,12 @@ class VertexArrayObject(
         glDeleteVertexArrays(id)
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is VertexArrayObject && this.id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
+
 }
