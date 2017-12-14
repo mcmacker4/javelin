@@ -7,8 +7,6 @@ import com.mcmacker4.javelin.gameobject.component.Camera
 import com.mcmacker4.javelin.gameobject.component.Mesh
 import com.mcmacker4.javelin.gl.shader.ShaderProgram
 import com.mcmacker4.javelin.gl.vertex.VertexArrayObject
-import com.mcmacker4.javelin.util.unaryMinus
-import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL11.GL_TRIANGLES

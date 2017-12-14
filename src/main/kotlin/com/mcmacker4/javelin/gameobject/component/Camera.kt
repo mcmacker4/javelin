@@ -1,6 +1,5 @@
 package com.mcmacker4.javelin.gameobject.component
 
-import com.mcmacker4.javelin.display.Display
 import com.mcmacker4.javelin.gameobject.Component
 
 

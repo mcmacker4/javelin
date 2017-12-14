@@ -26,7 +26,6 @@ object Keyboard {
         keyUpListeners.remove(listener)
     }
     
-    @Suppress("UNUSED_PARAMETER")
     fun keyboardCallback(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
         if(action == GLFW_RELEASE) {
             keys[key] = false

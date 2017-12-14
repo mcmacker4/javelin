@@ -9,20 +9,11 @@ import org.lwjgl.system.MemoryUtil
 
 object ModelLoader {
     
-    @Deprecated("Use loadMesh instead.")
-    fun load(vertices: FloatArray): Model {
-        val buffer = MemoryUtil.memAllocFloat(vertices.size).put(vertices)
-        buffer.flip()
-        val vbo = VertexAttribute(buffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
-        val vao = VertexArrayObject(hashMapOf(Pair(0, vbo)))
-        return Model(vao)
-    }
-    
     fun loadMesh(vertices: FloatArray) : VertexArrayObject {
         val buffer = MemoryUtil.memAllocFloat(vertices.size).put(vertices)
         buffer.flip()
         val vbo = VertexAttribute(buffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
-        return VertexArrayObject(hashMapOf(Pair(0, vbo)))
+        return VertexArrayObject(hashMapOf(Pair(VertexAttribute.ATTRIB_POSITION, vbo)))
     }
     
 }

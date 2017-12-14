@@ -2,7 +2,6 @@ package com.mcmacker4.javelin.util
 
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import org.joml.Vector4f
 
 
 operator fun Quaternionf.not() : Quaternionf {

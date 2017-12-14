@@ -13,7 +13,7 @@ class VertexAttribute(
         val offset: Long = 0)
     : VertexBufferObject(data, target, usage) {
     
-    val count = data.capacity() / size
+    val count = length / size
     
     companion object {
         val ATTRIB_POSITION = 0
