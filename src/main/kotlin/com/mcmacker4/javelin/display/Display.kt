@@ -2,8 +2,8 @@ package com.mcmacker4.javelin.display
 
 import com.mcmacker4.javelin.input.Keyboard
 import com.mcmacker4.javelin.input.Mouse
-import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
+import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.glClearColor
 import org.lwjgl.opengl.GL11.glViewport

@@ -1,6 +1,7 @@
 package com.mcmacker4.javelin.input
 
-import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.glfw.GLFW.GLFW_PRESS
+import org.lwjgl.glfw.GLFW.GLFW_RELEASE
 
 
 object Keyboard {

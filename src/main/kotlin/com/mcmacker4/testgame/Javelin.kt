@@ -5,9 +5,9 @@ import com.mcmacker4.javelin.gameobject.GameObject
 import com.mcmacker4.javelin.gameobject.World
 import com.mcmacker4.javelin.gameobject.component.Camera
 import com.mcmacker4.javelin.gameobject.component.Mesh
+import com.mcmacker4.javelin.graphics.Renderer
 import com.mcmacker4.javelin.input.Keyboard
 import com.mcmacker4.javelin.model.ModelLoader
-import com.mcmacker4.javelin.graphics.Renderer
 import com.mcmacker4.javelin.util.Resources
 import com.mcmacker4.javelin.util.Timer
 import org.lwjgl.glfw.GLFW.*
@@ -20,15 +20,6 @@ class Javelin {
     private val display: Display
     private val world: World
 
-    private val vertices = floatArrayOf(
-            -0.5f, 0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, 0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.5f, 0.5f, 0.0f
-    )
-
     init {
 
         //Initialize GLFW        
@@ -38,6 +29,7 @@ class Javelin {
 
         //Create display
         display = Display(1280, 720, "Javelin")
+        glEnable(GL_DEPTH_TEST)
         
         //Close application on ESCAPE
         Keyboard.onKeyDown { key, _ -> if(key == GLFW_KEY_ESCAPE) stop() }
@@ -52,8 +44,9 @@ class Javelin {
         world = World(renderer)
         
         //Create model GameObject
-        val square = GameObject(Mesh(ModelLoader.loadMesh(vertices)))
-        world.addGameObject(square)
+        val vao = ModelLoader.loadObj("anvil-blender-guru")
+        val gameObject = GameObject(Mesh(vao))
+        world.addGameObject(gameObject)
         
         //Create camera GameObject
         val camera = GameObject(Camera(), CameraControl())
@@ -71,7 +64,7 @@ class Javelin {
             
             val delta = timer.update()
 
-            glClear(GL_COLOR_BUFFER_BIT.or(GL_DEPTH_BUFFER_BIT))
+            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
             
             world.update(delta)
             world.render()

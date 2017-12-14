@@ -2,7 +2,8 @@ package com.mcmacker4.javelin.gl.vertex
 
 import com.mcmacker4.javelin.gl.GLObject
 import org.lwjgl.opengl.GL11.GL_FLOAT
-import org.lwjgl.opengl.GL20.*
+import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
+import org.lwjgl.opengl.GL20.glVertexAttribPointer
 import org.lwjgl.opengl.GL30.*
 
 
