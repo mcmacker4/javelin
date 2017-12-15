@@ -1,5 +1,6 @@
 package com.mcmacker4.javelin.gl.shader
 
+import org.joml.Vector3f
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20.*
 import java.nio.FloatBuffer
@@ -36,12 +37,28 @@ class ShaderProgram(private val vertexShader: Shader, private val fragmentShader
         glUseProgram(0)
     }
     
-    fun loadUniformMat4(name: String, matrix: FloatBuffer) {
-        val location = uniformLocations[name] ?: glGetUniformLocation(id, name)
-        if(location != -1) {
-            uniformLocations[name] = location
-            glUniformMatrix4fv(location, false, matrix)
-        }
+    fun location(name: String) : Int {
+        if(uniformLocations.containsKey(name))
+            return uniformLocations[name] ?: -1
+        val loc = glGetUniformLocation(id, name)
+        uniformLocations[name] = loc
+        return loc
+    }
+    
+    fun uniformBool(name: String, value: Boolean) {
+        glUniform1i(location(name), if(value) 1 else 0)
+    }
+    
+    fun uniform1f(name: String, value: Float) {
+        glUniform1f(location(name), value)
+    }
+    
+    fun uniform3f(name: String, vector: Vector3f) {
+        glUniform3f(location(name), vector.x, vector.y, vector.z)
+    }
+    
+    fun uniformMat4(name: String, matrix: FloatBuffer) {
+        glUniformMatrix4fv(location(name), false, matrix)
     }
 
     fun delete() {

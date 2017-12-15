@@ -18,10 +18,10 @@ class CameraControl : Script() {
         //Mouse Input
         Mouse.onMove { x, y ->
             parent.rotation.add((-y * sensitivity).toFloat(), (-x * sensitivity).toFloat(), 0f)
-            if(parent.rotation.x > Math.PI)
-                parent.rotation.x = Math.PI.toFloat() - 0.01f
-            if(parent.rotation.x < -Math.PI)
-                parent.rotation.x = -Math.PI.toFloat() + 0.01f
+            if(parent.rotation.x > Math.PI / 2)
+                parent.rotation.x = Math.PI.toFloat() / 2
+            if(parent.rotation.x < -Math.PI / 2)
+                parent.rotation.x = -Math.PI.toFloat() / 2
         }
         //Keyboard input
         Keyboard.onKeyDown { key, _ ->
@@ -47,7 +47,8 @@ class CameraControl : Script() {
     }
 
     override fun update(delta: Float) {
-        val deltaPos = Vector3f(direction).rotateY(parent.rotation.y)
+        //TODO: when JOML 1.9.7 is released, update build.gradle and remove " * 2" in the angle.
+        val deltaPos = Vector3f(direction).rotateY(parent.rotation.y * 2)
         if(deltaPos.length() > 0)
             deltaPos.normalize()
         parent.position.add(deltaPos * delta * speed)

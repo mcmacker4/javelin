@@ -10,6 +10,21 @@ import org.lwjgl.system.MemoryUtil
 
 
 object ModelLoader {
+
+    private val planeVertices = floatArrayOf(
+            -0.5f, 0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            -0.5f, 0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f
+    )
+    
+    private var planeVao: VertexArrayObject? = null
+    
+    fun plane() : VertexArrayObject {
+        return planeVao ?: loadMesh(planeVertices)
+    }
     
     fun loadMesh(vertices: FloatArray) : VertexArrayObject {
         val buffer = MemoryUtil.memAllocFloat(vertices.size).put(vertices)

@@ -19,7 +19,7 @@ open class GameObject(vararg components: Component) {
     }
     
     inline fun <reified T : Component> getComponent() : T? {
-        return componentsList.first { it is T } as T
+        return componentsList.firstOrNull { it is T } as T?
     }
     
     inline fun <reified T : Component> getComponents() : List<T> {

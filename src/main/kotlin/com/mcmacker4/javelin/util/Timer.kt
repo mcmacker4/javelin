@@ -14,6 +14,15 @@ class Timer {
     private var lastFPS = now
     private var frameCount = 0
     
+    private var totalFrameCount = 0
+    private val start = glfwGetTime()
+    
+    fun getAverageFPS() : Double {
+        val now = glfwGetTime()
+        val delta = now - start
+        return totalFrameCount / delta
+    }
+    
     fun update() : Float {
         now = glfwGetTime()
         delta = (now - last).toFloat()
@@ -26,6 +35,7 @@ class Timer {
         }
         
         frameCount++
+        totalFrameCount++
         return delta
     }
     
