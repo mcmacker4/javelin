@@ -12,13 +12,9 @@ import com.mcmacker4.javelin.gl.vertex.VertexArrayObject
 import com.mcmacker4.javelin.util.unaryMinus
 import org.joml.Matrix3f
 import org.joml.Matrix4f
-import org.joml.Vector3f
-import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.*
 import org.lwjgl.system.MemoryUtil
-import kotlin.math.cos
-import kotlin.math.sin
 
 
 class Renderer(var shaderProgram: ShaderProgram) {
@@ -26,7 +22,8 @@ class Renderer(var shaderProgram: ShaderProgram) {
     private val renderableObjects = MultimapBuilder.hashKeys().hashSetValues().build<VertexArrayObject, GameObject>()
     private val lights = arrayListOf<GameObject>()
 
-    private val tempMatrixBuffer = MemoryUtil.memAllocFloat(16)
+    private val tempMatrix4Buffer = MemoryUtil.memAllocFloat(16)
+    private val tempMatrix3Buffer = MemoryUtil.memAllocFloat(9)
 
     fun addGameObject(gameObject: GameObject) {
         if(gameObject.hasComponent<Mesh>()) {
@@ -55,8 +52,8 @@ class Renderer(var shaderProgram: ShaderProgram) {
                     .translate(-it.position)
             val cameraMatrix = Matrix4f()
             projectionMatrix.mul(viewMatrix, cameraMatrix)
-            cameraMatrix.get(tempMatrixBuffer)
-            shaderProgram.uniformMat4("cameraMatrix", tempMatrixBuffer)
+            cameraMatrix.get(tempMatrix4Buffer)
+            shaderProgram.uniformMat4("cameraMatrix", tempMatrix4Buffer)
             shaderProgram.uniform3f("viewPosition", it.position)
         }
     }
@@ -67,6 +64,9 @@ class Renderer(var shaderProgram: ShaderProgram) {
             val light = gameObject.getComponent<Light>()!!
             shaderProgram.uniform3f("lights[$i].position", gameObject.position)
             shaderProgram.uniform3f("lights[$i].color", light.color)
+            shaderProgram.uniform1f("lights[$i].constant", light.constant)
+            shaderProgram.uniform1f("lights[$i].linear", light.linear)
+            shaderProgram.uniform1f("lights[$i].quadratic", light.quadratic)
         }
         
         shaderProgram.uniform1i("lightCount", lights.size)
@@ -77,6 +77,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
 
         //Albedo
         glActiveTexture(GL_TEXTURE0)
+        shaderProgram.uniform1i("albedoMap", 0)
         shaderProgram.uniformBool("useAlbedoMap", material.useAlbedoMap)
         if(material.useAlbedoMap && material.albedoMap != null) {
             material.albedoMap.bind()
@@ -87,6 +88,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
         
         //Normal
         glActiveTexture(GL_TEXTURE1)
+        shaderProgram.uniform1i("normalMap", 1)
         shaderProgram.uniformBool("useNormalMap", material.useNormalMap)
         if(material.normalMap != null) {
             material.normalMap.bind()
@@ -96,6 +98,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
 
         //Metallic
         glActiveTexture(GL_TEXTURE2)
+        shaderProgram.uniform1i("metallicMap", 2)
         shaderProgram.uniformBool("useMetallicMap", material.useMetallicMap)
         if(material.metallicMap != null) {
             material.metallicMap.bind()
@@ -106,6 +109,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
 
         //Roughness
         glActiveTexture(GL_TEXTURE3)
+        shaderProgram.uniform1i("roughnessMap", 3)
         shaderProgram.uniformBool("useRoughnessMap", material.useRoughnessMap)
         if(material.roughnessMap != null) {
             material.roughnessMap.bind()
@@ -122,14 +126,14 @@ class Renderer(var shaderProgram: ShaderProgram) {
         
         loadMaterial(gameObject.getComponent() ?: Material.DEFAULT)
 
-        gameObject.modelMatrix.get(tempMatrixBuffer)
-        shaderProgram.uniformMat4("modelMatrix", tempMatrixBuffer)
+        gameObject.modelMatrix.get(tempMatrix4Buffer)
+        shaderProgram.uniformMat4("modelMatrix", tempMatrix4Buffer)
         
         //Load normal matrix
-        Matrix4f(gameObject.modelMatrix).invert().transpose().get(tempMatrixBuffer)
-        shaderProgram.uniformMat4("normalMatrix", tempMatrixBuffer)
-
-        glDrawArrays(GL_TRIANGLES, 0, mesh.vao.vertexCount)
+        Matrix3f(gameObject.modelMatrix).invert().transpose().get(tempMatrix3Buffer)
+        shaderProgram.uniformMat3("normalMatrix", tempMatrix3Buffer)
+        
+        glDrawElements(GL_TRIANGLES, mesh.vao.vertexCount, GL_UNSIGNED_INT, 0)
 
     }
 
@@ -149,7 +153,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
             vao.bind()
 
             //For each Mesh with the same VertexArrayObject
-            renderableObjects.get(vao).forEach gameObject@ {
+            renderableObjects.get(vao).forEach {
                 
                 drawObject(it)
                 

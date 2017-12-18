@@ -56,6 +56,10 @@ class ShaderProgram(private val vertexShader: Shader, private val fragmentShader
     fun uniform3f(name: String, vector: Vector3f) {
         glUniform3f(location(name), vector.x, vector.y, vector.z)
     }
+
+    fun uniformMat3(name: String, matrix: FloatBuffer) {
+        glUniformMatrix3fv(location(name), false, matrix)
+    }
     
     fun uniformMat4(name: String, matrix: FloatBuffer) {
         glUniformMatrix4fv(location(name), false, matrix)

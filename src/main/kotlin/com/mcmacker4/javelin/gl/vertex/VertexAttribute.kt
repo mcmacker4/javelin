@@ -20,6 +20,7 @@ class VertexAttribute(
         val ATTRIB_NORMAL = 1
         val ATTRIB_TEXTURE_COORD = 2
         val ATTRIB_COLOR = 3
+        val ATTRIB_TANGENTS = 4
     }
     
 }

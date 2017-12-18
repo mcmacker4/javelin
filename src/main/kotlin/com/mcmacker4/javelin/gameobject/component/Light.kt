@@ -5,5 +5,8 @@ import org.joml.Vector3f
 
 
 class Light(
-        val color: Vector3f
+        val color: Vector3f,
+        val constant: Float,
+        val linear: Float,
+        val quadratic: Float
 ) : Component()

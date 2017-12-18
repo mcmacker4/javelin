@@ -72,7 +72,7 @@ class Display(
 
             glViewport(0, 0, width, height)
 
-            glClearColor(0.3f, 0.6f, 0.9f, 1.0f)
+            glClearColor(0f, 0f, 0f, 1.0f)
 
         }
         
@@ -95,6 +95,10 @@ class Display(
     
     fun onResize(listener: (Int, Int) -> Unit) {
         resizeListeners.add(listener)
+    }
+    
+    fun setTitle(title: String) {
+        glfwSetWindowTitle(window, title)
     }
     
     companion object {

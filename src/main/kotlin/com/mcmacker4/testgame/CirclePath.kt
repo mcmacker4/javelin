@@ -10,7 +10,7 @@ class CirclePath : Script() {
 
     override fun update(delta: Float) {
         val time = glfwGetTime().toFloat()
-        parent.position.set(sin(time) * 3f, cos(time) * 3f, 4f)
+        parent.position.set(sin(time) * 3f, cos(time) * 3f, 3f)
     }
     
 }

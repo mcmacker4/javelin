@@ -1,6 +1,7 @@
 package com.mcmacker4.javelin.util
 
 import com.mcmacker4.javelin.gl.shader.ShaderProgram
+import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.system.MemoryUtil
 import java.io.FileNotFoundException
@@ -33,6 +34,8 @@ object Resources {
     
     fun loadImageData(path: String) : ImageData {
         
+        val startTime = glfwGetTime()
+        
         val imageBuffer = loadIntoByteBuffer(path)
         
         stackPush().use { stack ->
@@ -41,13 +44,22 @@ object Resources {
             val height = stack.mallocInt(1)
             val channels = stack.mallocInt(1)
 
-            val image = stbi_load_from_memory(imageBuffer, width, height, channels, 0)
+            val image = stbi_load_from_memory(imageBuffer, width, height, channels, 3)
                 ?: throw RuntimeException("Failed to load image: ${stbi_failure_reason()}")
-            
-            if(channels.get(0) == 4)
-                premultiplyAlpha(image, width.get(0), height.get(0))
 
-            return ImageData(width.get(0), height.get(0), channels.get(0), image)
+            /**
+             * Comment reason: Loading RGBA (4 channel) images will not work, that's why
+             * 3 channels is specified in stbi_load.
+             */
+//            if(channels.get(0) == 4)
+//                premultiplyAlpha(image, width.get(0), height.get(0))
+
+            val imageData = ImageData(width.get(0), height.get(0), 3, image)
+            
+            val elapsedTime = Math.round((glfwGetTime() - startTime) * 1000)
+            println("Loaded IMG: $path - ${channels.get(0)} channels ($elapsedTime ms)")
+            
+            return imageData
 
         }
     }

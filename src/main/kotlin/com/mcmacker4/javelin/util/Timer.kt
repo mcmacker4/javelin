@@ -1,5 +1,6 @@
 package com.mcmacker4.javelin.util
 
+import com.mcmacker4.javelin.display.Display
 import org.lwjgl.glfw.GLFW.glfwGetTime
 
 
@@ -20,7 +21,8 @@ class Timer {
         last = now
         
         if(now - lastFPS >= 1.0) {
-            println("FPS: $frameCount")
+            //println("FPS: $frameCount")
+            Display.MAIN.setTitle("FPS: $frameCount")
             lastFPS = now
             frameCount = 0
         }

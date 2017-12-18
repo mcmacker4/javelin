@@ -1,16 +1,28 @@
 package com.mcmacker4.javelin.gl.vertex
 
 import com.mcmacker4.javelin.gl.GLObject
+import org.lwjgl.opengl.GL11.GL_FLOAT
 import org.lwjgl.opengl.GL15.*
 import java.nio.FloatBuffer
+import java.nio.IntBuffer
 
 
-open class VertexBufferObject(data: FloatBuffer, private val target: Int, private val usage: Int) : GLObject() {
+open class VertexBufferObject private constructor(
+        val target: Int,
+        val usage: Int,
+        val type: Int,
+        val length: Int
+) : GLObject() {
     
     override val id = glGenBuffers()
-    val length = data.capacity()
     
-    init {
+    constructor(data: FloatBuffer, target: Int, usage: Int) : this(target, usage, GL_FLOAT, data.capacity()) {
+        bind()
+        setData(data)
+        unbind()
+    }
+
+    constructor(data: IntBuffer, target: Int, usage: Int) : this(target, usage, GL_FLOAT, data.capacity()) {
         bind()
         setData(data)
         unbind()
@@ -20,8 +32,18 @@ open class VertexBufferObject(data: FloatBuffer, private val target: Int, privat
         checkBoundState()
         glBufferData(target, data, usage)
     }
+
+    fun setData(data: IntBuffer) {
+        checkBoundState()
+        glBufferData(target, data, usage)
+    }
     
     fun setSubData(data: FloatBuffer, offset: Long) {
+        checkBoundState()
+        glBufferSubData(target, offset, data)
+    }
+
+    fun setSubData(data: IntBuffer, offset: Long) {
         checkBoundState()
         glBufferSubData(target, offset, data)
     }
