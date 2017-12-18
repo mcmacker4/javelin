@@ -20,10 +20,19 @@ object ModelLoader {
             0.5f, 0.5f, 0.0f
     )
     
+    private val planeNormals = floatArrayOf(
+            0f, 0f, -1f,
+            0f, 0f, -1f,
+            0f, 0f, -1f,
+            0f, 0f, -1f,
+            0f, 0f, -1f,
+            0f, 0f, -1f
+    )
+    
     private var planeVao: VertexArrayObject? = null
     
     fun plane() : VertexArrayObject {
-        return planeVao ?: loadMesh(planeVertices)
+        return planeVao ?: loadMesh(planeVertices, planeNormals)
     }
     
     fun loadMesh(vertices: FloatArray) : VertexArrayObject {
@@ -31,6 +40,19 @@ object ModelLoader {
         buffer.flip()
         val vbo = VertexAttribute(buffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         return VertexArrayObject(hashMapOf(Pair(VertexAttribute.ATTRIB_POSITION, vbo)))
+    }
+    
+    fun loadMesh(vertices: FloatArray, normals: FloatArray) : VertexArrayObject {
+        val verticesBuffer = MemoryUtil.memAllocFloat(vertices.size).put(vertices)
+        val normalsBuffer = MemoryUtil.memAllocFloat(vertices.size).put(normals)
+        verticesBuffer.flip()
+        normalsBuffer.flip()
+        val verticesAttribute = VertexAttribute(verticesBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
+        val normalsAttribute = VertexAttribute(normalsBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
+        return VertexArrayObject(hashMapOf(
+                Pair(VertexAttribute.ATTRIB_POSITION, verticesAttribute),
+                Pair(VertexAttribute.ATTRIB_NORMAL, normalsAttribute)
+        ))
     }
     
     fun loadObj(name: String) : VertexArrayObject {

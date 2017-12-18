@@ -79,8 +79,8 @@ abstract class Application {
 
     private fun cleanUp() {
         
-        println(timer.getAverageFPS())
-
+        Resources.cleanUp()
+        
         display.destroy()
 
         glfwTerminate()

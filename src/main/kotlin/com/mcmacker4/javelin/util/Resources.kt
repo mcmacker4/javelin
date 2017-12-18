@@ -14,6 +14,8 @@ import kotlin.experimental.and
 
 object Resources {
     
+    private val loadedImages = arrayListOf<ByteBuffer>()
+    
     fun loadShader(name: String) : ShaderProgram {
         val vertex = loadTextFile("shaders/$name.v.glsl")
         val fragment = loadTextFile("shaders/$name.f.glsl")
@@ -75,12 +77,19 @@ object Resources {
                         buffer = MemoryUtil.memRealloc(buffer, buffer.capacity() * 3 / 2) // 50%
                 }
                 buffer.flip()
+                loadedImages.add(buffer)
                 return buffer
             }
         }
         
         throw FileNotFoundException(path)
         
+    }
+    
+    fun cleanUp() {
+        loadedImages.forEach {
+            stbi_image_free(it)
+        }
     }
     
 }

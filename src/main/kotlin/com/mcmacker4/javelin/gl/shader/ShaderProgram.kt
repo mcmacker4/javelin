@@ -66,5 +66,9 @@ class ShaderProgram(private val vertexShader: Shader, private val fragmentShader
         fragmentShader.delete()
         glDeleteProgram(id)
     }
-    
+
+    fun uniform1i(name: String, value: Int) {
+        glUniform1i(location(name), value)
+    }
+
 }

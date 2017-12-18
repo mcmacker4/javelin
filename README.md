@@ -6,4 +6,4 @@ An open Graphics Engine using OpenGL 3.
 
 Current Status
 
-![image of current status](https://mcmacker4.com/javelin-anvil.png)
+![image of current status](https://mcmacker4.com/javelin-anvil-2.png)
