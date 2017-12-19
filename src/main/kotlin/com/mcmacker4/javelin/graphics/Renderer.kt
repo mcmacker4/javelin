@@ -77,19 +77,19 @@ class Renderer(var shaderProgram: ShaderProgram) {
 
         //Albedo
         glActiveTexture(GL_TEXTURE0)
-        shaderProgram.uniform1i("albedoMap", 0)
-        shaderProgram.uniformBool("useAlbedoMap", material.useAlbedoMap)
+        shaderProgram.uniform1i("material.albedoMap", 0)
+        shaderProgram.uniformBool("material.useAlbedoMap", material.useAlbedoMap)
         if(material.useAlbedoMap && material.albedoMap != null) {
             material.albedoMap.bind()
         } else {
             glBindTexture(GL_TEXTURE_2D, 0)
-            shaderProgram.uniform3f("baseColor", material.baseColor!!)
+            shaderProgram.uniform3f("material.baseColor", material.baseColor!!)
         }
         
         //Normal
         glActiveTexture(GL_TEXTURE1)
-        shaderProgram.uniform1i("normalMap", 1)
-        shaderProgram.uniformBool("useNormalMap", material.useNormalMap)
+        shaderProgram.uniform1i("material.normalMap", 1)
+        shaderProgram.uniformBool("material.useNormalMap", material.useNormalMap)
         if(material.normalMap != null) {
             material.normalMap.bind()
         } else {
@@ -98,24 +98,24 @@ class Renderer(var shaderProgram: ShaderProgram) {
 
         //Metallic
         glActiveTexture(GL_TEXTURE2)
-        shaderProgram.uniform1i("metallicMap", 2)
-        shaderProgram.uniformBool("useMetallicMap", material.useMetallicMap)
+        shaderProgram.uniform1i("material.metallicMap", 2)
+        shaderProgram.uniformBool("material.useMetallicMap", material.useMetallicMap)
         if(material.metallicMap != null) {
             material.metallicMap.bind()
         } else {
             glBindTexture(GL_TEXTURE_2D, 0)
-            shaderProgram.uniform1f("metallic", material.metallic!!)
+            shaderProgram.uniform1f("material.metallic", material.metallic!!)
         }
 
         //Roughness
         glActiveTexture(GL_TEXTURE3)
-        shaderProgram.uniform1i("roughnessMap", 3)
-        shaderProgram.uniformBool("useRoughnessMap", material.useRoughnessMap)
+        shaderProgram.uniform1i("material.roughnessMap", 3)
+        shaderProgram.uniformBool("material.useRoughnessMap", material.useRoughnessMap)
         if(material.roughnessMap != null) {
             material.roughnessMap.bind()
         } else {
             glBindTexture(GL_TEXTURE_2D, 0)
-            shaderProgram.uniform1f("roughness", material.roughness!!)
+            shaderProgram.uniform1f("material.roughness", material.roughness!!)
         }
         
     }
