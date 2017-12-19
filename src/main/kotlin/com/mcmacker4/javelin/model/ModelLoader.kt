@@ -19,7 +19,7 @@ object ModelLoader {
     private var planeVao: VertexArrayObject? = null
     
     fun plane() : VertexArrayObject {
-        return planeVao ?: loadMesh(planeIndices, planeVertices, planeNormals, texCoords, tangents)
+        return planeVao ?: loadMesh(planeVertices, planeNormals, texCoords, tangents)
     }
     
     private fun toFloatBuffer(data: FloatArray) : FloatBuffer {
@@ -28,21 +28,13 @@ object ModelLoader {
         buffer.flip()
         return buffer
     }
-    
-    private fun toIntBuffer(data: IntArray) : IntBuffer {
-        val buffer = MemoryUtil.memAllocInt(data.size)
-        buffer.put(data)
-        buffer.flip()
-        return buffer
-    }
 
-    fun loadMesh(indices: IntArray, vertices: FloatArray, normals: FloatArray, texCoords: FloatArray, tangents: FloatArray) : VertexArrayObject {
-        val indicesVBO = VertexBufferObject(toIntBuffer(indices), GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+    fun loadMesh(vertices: FloatArray, normals: FloatArray, texCoords: FloatArray, tangents: FloatArray) : VertexArrayObject {
         val verticesAttribute = VertexAttribute(toFloatBuffer(vertices), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         val normalsAttribute = VertexAttribute(toFloatBuffer(normals), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         val texCoordsAttribute = VertexAttribute(toFloatBuffer(texCoords), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 2)
         val tangentsAttribute = VertexAttribute(toFloatBuffer(tangents), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
-        return VertexArrayObject(indicesVBO, hashMapOf(
+        return VertexArrayObject(hashMapOf(
                 Pair(VertexAttribute.ATTRIB_POSITION, verticesAttribute),
                 Pair(VertexAttribute.ATTRIB_NORMAL, normalsAttribute),
                 Pair(VertexAttribute.ATTRIB_TEXTURE_COORD, texCoordsAttribute),
@@ -85,34 +77,21 @@ object ModelLoader {
             normals: ArrayList<Vector3f>,
             texCoords: ArrayList<Vector2f>) : VertexArrayObject {
         
-        val indices = arrayListOf<Int>()
-        
-        val ordVertices = FloatArray(vertices.size * 3)
-        val ordNormals = FloatArray(vertices.size * 3)
-        val ordTexCoords = FloatArray(vertices.size * 2)
-        val ordTangents = FloatArray(vertices.size * 3)
+        val ordVertices = arrayListOf<Vector3f>()
+        val ordNormals = arrayListOf<Vector3f>()
+        val ordTexCoords = arrayListOf<Vector2f>()
+        val ordTangents = arrayListOf<Vector3f>()
         
         fun processVertex(vIndices: List<Int>) {
-            //Index
-            val index = vIndices[0]
-            indices.add(index)
             //Vertex
-            ordVertices[index * 3    ] = vertices[index].x
-            ordVertices[index * 3 + 1] = vertices[index].y
-            ordVertices[index * 3 + 2] = vertices[index].z
+            ordVertices.add(vertices[vIndices[0]])
             //Normal
-            val normalIndex = vIndices[2]
-            ordNormals[index * 3    ] = normals[normalIndex].x
-            ordNormals[index * 3 + 1] = normals[normalIndex].y
-            ordNormals[index * 3 + 2] = normals[normalIndex].z
+            ordNormals.add(normals[vIndices[2]])
             //TexCoord (UV)
-            val texCoordIndex = vIndices[1]
-            ordTexCoords[index * 2    ] = texCoords[texCoordIndex].x
-            ordTexCoords[index * 2 + 1] = texCoords[texCoordIndex].y
+            ordTexCoords.add(texCoords[vIndices[1]])
         }
         
         fun calculateTangent(
-                index: Int,
                 vertex1: Pair<Vector3f, Vector2f>,
                 vertex2: Pair<Vector3f, Vector2f>,
                 vertex3: Pair<Vector3f, Vector2f>) {
@@ -132,9 +111,7 @@ object ModelLoader {
             
             tangent.normalize()
             
-            ordTangents[index * 3    ] = tangent.x
-            ordTangents[index * 3 + 1] = tangent.y
-            ordTangents[index * 3 + 2] = tangent.z
+            ordTangents.add(tangent)
             
         }
         
@@ -146,54 +123,60 @@ object ModelLoader {
                         .map { it.split("/").map { it.toInt() - 1 } }
             //Process vertices one by one
             processVertex(lineIndices[0])
-            calculateTangent(lineIndices[0][0],
+            calculateTangent(
                     Pair(vertices[lineIndices[0][0]], texCoords[lineIndices[0][1]]),
                     Pair(vertices[lineIndices[1][0]], texCoords[lineIndices[1][1]]),
                     Pair(vertices[lineIndices[2][0]], texCoords[lineIndices[2][1]])
             )
             processVertex(lineIndices[1])
-            calculateTangent(lineIndices[1][0],
+            calculateTangent(
                     Pair(vertices[lineIndices[1][0]], texCoords[lineIndices[1][1]]),
                     Pair(vertices[lineIndices[2][0]], texCoords[lineIndices[2][1]]),
                     Pair(vertices[lineIndices[0][0]], texCoords[lineIndices[0][1]])
             )
             processVertex(lineIndices[2])
-            calculateTangent(lineIndices[2][0],
+            calculateTangent(
                     Pair(vertices[lineIndices[2][0]], texCoords[lineIndices[2][1]]),
                     Pair(vertices[lineIndices[1][0]], texCoords[lineIndices[1][1]]),
                     Pair(vertices[lineIndices[0][0]], texCoords[lineIndices[0][1]])
             )
         }
         
-        return createVAO(indices, ordVertices, ordNormals, ordTexCoords, ordTangents)
+        return createVAO(ordVertices, ordNormals, ordTexCoords, ordTangents)
         
     }
     
     private fun createVAO(
-            indices: List<Int>,
-            ordVertices: FloatArray,
-            ordNormals: FloatArray,
-            ordTexCoords: FloatArray,
-            ordTangents: FloatArray) : VertexArrayObject {
+            ordVertices: ArrayList<Vector3f>,
+            ordNormals: ArrayList<Vector3f>,
+            ordTexCoords: ArrayList<Vector2f>,
+            ordTangents: ArrayList<Vector3f>) : VertexArrayObject {
         
-        val indicesBuffer = toIntBuffer(indices.toIntArray())
-        val verticesBuffer = toFloatBuffer(ordVertices)
-        val normalsBuffer = toFloatBuffer(ordNormals)
-        val texCoordsBuffer = toFloatBuffer(ordTexCoords)
-        val tangentsBuffer = toFloatBuffer(ordTangents)
+        val verticesBuffer = MemoryUtil.memAllocFloat(ordVertices.size * 3)
+        val normalsBuffer = MemoryUtil.memAllocFloat(ordNormals.size * 3)
+        val texCoordsBuffer = MemoryUtil.memAllocFloat(ordTexCoords.size * 2)
+        val tangentsBuffer = MemoryUtil.memAllocFloat(ordTangents.size * 3)
         
-        val indicesVBO = VertexBufferObject(indicesBuffer, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+        ordVertices.forEach { verticesBuffer.put(it.x); verticesBuffer.put(it.y); verticesBuffer.put(it.z);  }
+        ordNormals.forEach { normalsBuffer.put(it.x); normalsBuffer.put(it.y); normalsBuffer.put(it.z);  }
+        ordTexCoords.forEach { texCoordsBuffer.put(it.x); texCoordsBuffer.put(it.y); }
+        ordTangents.forEach { tangentsBuffer.put(it.x); tangentsBuffer.put(it.y); tangentsBuffer.put(it.z); }
+        
+        verticesBuffer.flip()
+        normalsBuffer.flip()
+        texCoordsBuffer.flip()
+        tangentsBuffer.flip()
+        
         val verticesAttribute = VertexAttribute(verticesBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         val normalsAttribute = VertexAttribute(normalsBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         val texCoordsAttribute = VertexAttribute(texCoordsBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 2)
         val tangentsAttribute = VertexAttribute(tangentsBuffer, GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
         
-        MemoryUtil.memFree(indicesBuffer)
         MemoryUtil.memFree(verticesBuffer)
         MemoryUtil.memFree(normalsBuffer)
         MemoryUtil.memFree(texCoordsBuffer)
         
-        return VertexArrayObject(indicesVBO, hashMapOf(
+        return VertexArrayObject(hashMapOf(
                 Pair(VertexAttribute.ATTRIB_POSITION, verticesAttribute),
                 Pair(VertexAttribute.ATTRIB_NORMAL, normalsAttribute),
                 Pair(VertexAttribute.ATTRIB_TEXTURE_COORD, texCoordsAttribute),
@@ -201,18 +184,18 @@ object ModelLoader {
         ))
     }
     
-    private val planeIndices = intArrayOf(
-            0, 1, 2, 0, 2, 3
-    )
-
     private val planeVertices = floatArrayOf(
             -1f, 1f, 0.0f,
             -1f, -1f, 0.0f,
+            1f, -1f, 0.0f,
+            -1f, 1f, 0.0f,
             1f, -1f, 0.0f,
             1f, 1f, 0.0f
     )
 
     private val planeNormals = floatArrayOf(
+            0f, 0f, 1f,
+            0f, 0f, 1f,
             0f, 0f, 1f,
             0f, 0f, 1f,
             0f, 0f, 1f,
@@ -223,10 +206,14 @@ object ModelLoader {
             0f, 1f,
             0f, 0f,
             1f, 0f,
+            0f, 1f,
+            1f, 0f,
             1f, 1f
     )
     
     private val tangents = floatArrayOf(
+            1f, 0f, 0f,
+            1f, 0f, 0f,
             1f, 0f, 0f,
             1f, 0f, 0f,
             1f, 0f, 0f,

@@ -133,7 +133,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
         Matrix3f(gameObject.modelMatrix).invert().transpose().get(tempMatrix3Buffer)
         shaderProgram.uniformMat3("normalMatrix", tempMatrix3Buffer)
         
-        glDrawElements(GL_TRIANGLES, mesh.vao.vertexCount, GL_UNSIGNED_INT, 0)
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vao.vertexCount)
 
     }
 

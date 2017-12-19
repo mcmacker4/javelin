@@ -8,16 +8,14 @@ import org.lwjgl.opengl.GL30.*
 
 
 class VertexArrayObject(
-        private val indicesVBO: VertexBufferObject,
         private val attributes: HashMap<Int, VertexAttribute>
 ) : GLObject() {
 
     override val id = glGenVertexArrays()
-    val vertexCount = indicesVBO.length
+    val vertexCount = attributes[VertexAttribute.ATTRIB_POSITION]!!.length
     
     init {
         bind()
-        indicesVBO.bind()
         attributes.forEach { index, attribute ->
             attribute.bind()
             glVertexAttribPointer(index, attribute.size, GL_FLOAT, attribute.normalized, attribute.stride, attribute.offset)
