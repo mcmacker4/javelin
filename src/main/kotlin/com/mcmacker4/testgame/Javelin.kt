@@ -50,8 +50,8 @@ class Javelin : Application() {
                 toRadians(20.0).toFloat()
         ))
         //light2.position.set(-8f, 15f, -15f)
-        light2.position.set(0f, 10f, -5f)
-        light2.rotation.set(-Math.PI.toFloat() / 2, 0f, 0f)
+        light2.position.set(0f, 10f, 5f)
+        light2.rotation.set(-Math.PI.toFloat() / 4 - 0.2f, 0f, 0f)
         world.addGameObject(light2)
         
     }

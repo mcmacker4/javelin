@@ -27,8 +27,6 @@ abstract class Application {
 
         //Create display
         display = Display(1280, 720, "Javelin")
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
         
         //Close application on ESCAPE
         Keyboard.onKeyDown { key, _ -> if(key == GLFW_KEY_ESCAPE) stop() }
@@ -37,7 +35,7 @@ abstract class Application {
         val shaderProgram = Resources.loadShader("shader")
         
         //Create Renderer
-        val renderer = Renderer(shaderProgram)
+        val renderer = Renderer()
         
         //Create World
         world = World(renderer)
@@ -53,8 +51,6 @@ abstract class Application {
             
             val delta = timer.update()
 
-            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-            
             world.update(delta)
             world.render()
 

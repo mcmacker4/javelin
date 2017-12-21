@@ -50,6 +50,16 @@ object ModelLoader {
         ))
     }
     
+    fun loadRenderQuad() : VertexArrayObject {
+        val indicesAttribute = VertexBufferObject(toIntBuffer(planeIndices), GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+        val verticesAttribute = VertexAttribute(toFloatBuffer(planeVertices), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
+        val texCoordsAttribute = VertexAttribute(toFloatBuffer(texCoords), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 2)
+        return VertexArrayObject(indicesAttribute, hashMapOf(
+                Pair(VertexAttribute.ATTRIB_POSITION, verticesAttribute),
+                Pair(VertexAttribute.ATTRIB_TEXTURE_COORD, texCoordsAttribute)
+        ))
+    }
+    
     fun loadObj(name: String) : VertexArrayObject {
         
         val path = "models/$name.obj"
@@ -206,10 +216,10 @@ object ModelLoader {
     )
 
     private val planeVertices = floatArrayOf(
-            -1f, 1f, 0.0f,
-            -1f, -1f, 0.0f,
-            1f, -1f, 0.0f,
-            1f, 1f, 0.0f
+            -1f, 1f, 0f,
+            -1f, -1f, 0f,
+            1f, -1f, 0f,
+            1f, 1f, 0f
     )
 
     private val planeNormals = floatArrayOf(
@@ -220,10 +230,10 @@ object ModelLoader {
     )
 
     private val texCoords = floatArrayOf(
-            0f, 0f,
             0f, 1f,
-            1f, 1f,
-            1f, 0f
+            0f, 0f,
+            1f, 0f,
+            1f, 1f
     )
     
     private val tangents = floatArrayOf(

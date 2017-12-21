@@ -25,5 +25,9 @@ class FrameBuffer : GLObject() {
     fun setTextureAttachment(attachment: Int, texture: GLTexture2D) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture.id, 0)
     }
+    
+    fun setRenderbufferAttachment(attachment: Int, renderBuffer: RenderBuffer) {
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderBuffer.id)
+    }
 
 }

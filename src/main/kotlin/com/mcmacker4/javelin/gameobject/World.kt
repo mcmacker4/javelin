@@ -42,7 +42,7 @@ class World(private var renderer: Renderer) {
     }
     
     fun render() {
-        renderer.render(activeCamera)
+        renderer.renderDeferred(activeCamera)
     }
     
 }
