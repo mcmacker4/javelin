@@ -1,17 +1,11 @@
 package com.mcmacker4.javelin
 
 import com.mcmacker4.javelin.display.Display
-import com.mcmacker4.javelin.gameobject.GameObject
 import com.mcmacker4.javelin.gameobject.World
-import com.mcmacker4.javelin.gameobject.component.Camera
-import com.mcmacker4.javelin.gameobject.component.Mesh
 import com.mcmacker4.javelin.graphics.Renderer
 import com.mcmacker4.javelin.input.Keyboard
-import com.mcmacker4.javelin.model.ModelLoader
 import com.mcmacker4.javelin.util.Resources
 import com.mcmacker4.javelin.util.Timer
-import com.mcmacker4.testgame.AnvilRotation
-import com.mcmacker4.testgame.CameraControl
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL11.*

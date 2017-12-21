@@ -18,8 +18,8 @@ object ModelLoader {
 
     private var planeVao: VertexArrayObject? = null
     
-    fun plane() : VertexArrayObject {
-        return planeVao ?: loadMesh(planeIndices, planeVertices, planeNormals, texCoords, tangents)
+    fun plane(scale: Float) : VertexArrayObject {
+        return planeVao ?: loadMesh(planeIndices, planeVertices, planeNormals, texCoords.map { it * scale }.toFloatArray(), tangents)
     }
     
     private fun toFloatBuffer(data: FloatArray) : FloatBuffer {
@@ -220,10 +220,10 @@ object ModelLoader {
     )
 
     private val texCoords = floatArrayOf(
-            0f, 1f,
             0f, 0f,
-            1f, 0f,
-            1f, 1f
+            0f, 1f,
+            1f, 1f,
+            1f, 0f
     )
     
     private val tangents = floatArrayOf(

@@ -4,7 +4,7 @@ import com.mcmacker4.javelin.gameobject.Component
 import org.joml.Vector3f
 
 
-class Light(
+abstract class Light(
         val color: Vector3f,
         val constant: Float,
         val linear: Float,

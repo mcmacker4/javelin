@@ -3,10 +3,7 @@ package com.mcmacker4.javelin.graphics
 import com.google.common.collect.MultimapBuilder
 import com.mcmacker4.javelin.display.Display
 import com.mcmacker4.javelin.gameobject.GameObject
-import com.mcmacker4.javelin.gameobject.component.Camera
-import com.mcmacker4.javelin.gameobject.component.Light
-import com.mcmacker4.javelin.gameobject.component.Material
-import com.mcmacker4.javelin.gameobject.component.Mesh
+import com.mcmacker4.javelin.gameobject.component.*
 import com.mcmacker4.javelin.gl.shader.ShaderProgram
 import com.mcmacker4.javelin.gl.vertex.VertexArrayObject
 import com.mcmacker4.javelin.util.unaryMinus
@@ -38,7 +35,7 @@ class Renderer(var shaderProgram: ShaderProgram) {
         if(gameObject.hasComponent<Mesh>()) {
             val mesh = gameObject.getComponent<Mesh>()!!
             renderableObjects.remove(mesh.vao, gameObject)
-        } else if(gameObject.hasComponent<Light>()) {
+        } else if(gameObject.hasComponent<PointLight>()) {
             lights.remove(gameObject)
         }
     }
@@ -60,16 +57,32 @@ class Renderer(var shaderProgram: ShaderProgram) {
     
     private fun loadLights() {
         
-        lights.forEachIndexed { i, gameObject ->
-            val light = gameObject.getComponent<Light>()!!
-            shaderProgram.uniform3f("lights[$i].position", gameObject.position)
-            shaderProgram.uniform3f("lights[$i].color", light.color)
-            shaderProgram.uniform1f("lights[$i].constant", light.constant)
-            shaderProgram.uniform1f("lights[$i].linear", light.linear)
-            shaderProgram.uniform1f("lights[$i].quadratic", light.quadratic)
+        //Point Lights
+        val pointLights = lights.filter { it.hasComponent<PointLight>() }
+        pointLights.forEachIndexed { i, gameObject ->
+            val light = gameObject.getComponent<PointLight>()!!
+            shaderProgram.uniform3f("pointLights[$i].position", gameObject.position)
+            shaderProgram.uniform3f("pointLights[$i].color", light.color)
+            shaderProgram.uniform1f("pointLights[$i].constant", light.constant)
+            shaderProgram.uniform1f("pointLights[$i].linear", light.linear)
+            shaderProgram.uniform1f("pointLights[$i].quadratic", light.quadratic)
         }
+        shaderProgram.uniform1i("pointLightCount", pointLights.size)
         
-        shaderProgram.uniform1i("lightCount", lights.size)
+        //Spot Lights
+        val spotLights = lights.filter { it.hasComponent<SpotLight>() }
+        spotLights.forEachIndexed { i, gameObject ->
+            val light = gameObject.getComponent<SpotLight>()!!
+            shaderProgram.uniform3f("spotLights[$i].position", gameObject.position)
+            shaderProgram.uniform3f("spotLights[$i].color", light.color)
+            shaderProgram.uniform1f("spotLights[$i].constant", light.constant)
+            shaderProgram.uniform1f("spotLights[$i].linear", light.linear)
+            shaderProgram.uniform1f("spotLights[$i].quadratic", light.quadratic)
+            shaderProgram.uniform1f("spotLights[$i].angle", light.angle)
+            shaderProgram.uniform3f("spotLights[$i].direction", light.getLightDirection())
+        }
+        shaderProgram.uniform1i("spotLightCount", spotLights.size)
+        
         
     }
     
