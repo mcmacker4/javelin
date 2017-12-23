@@ -64,8 +64,10 @@ vec3 calculatePointLight(PointLight light, Fragment frag, vec3 viewDir) {
     vec3 diffuse = dot(frag.normal, lightDir) * frag.color * light.color;
     
     //specular
-    vec3 reflectDir = normalize(reflect(-lightDir, frag.normal));
-    vec3 specular =  pow(max(dot(viewDir, reflectDir), 0.0), 32) * light.color * frag.color * frag.specular;
+    vec3 halfway = normalize(lightDir + viewDir);
+    vec3 specular = pow(max(dot(frag.normal, halfway), 0.0), 16.0) * light.color * frag.color * frag.specular;
+//    vec3 reflectDir = normalize(reflect(-lightDir, frag.normal));
+//    vec3 specular =  pow(max(dot(viewDir, reflectDir), 0.0), 32) * light.color * frag.color * frag.specular;
     
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
     
@@ -75,7 +77,7 @@ vec3 calculatePointLight(PointLight light, Fragment frag, vec3 viewDir) {
 }
 
 vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
-    
+
     vec3 lightDir = normalize(light.position - frag.position); //Points to light
     
 //    if(dot(-lightDir, normalize(light.direction)) < angleToDotValue(light.angle))
@@ -85,8 +87,7 @@ vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
     //Position to uv coordinates
     vec4 lightSpacePos = light.matrix * vec4(frag.position, 1.0);
     vec3 projection = lightSpacePos.xyz / lightSpacePos.w; // [-1, 1] ?
-    //Circle
-    if(length(projection) > 1.0) return vec3(0.0);
+    float len = length(projection);
     //
     projection = projection * 0.5 + 0.5;
     //Get depth
@@ -96,19 +97,22 @@ vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
     if(projection.z - 0.001 > rayDepth)
         return vec3(0.0);
     
+    float falloff = clamp(1 - (len - 0.9) * 10, 0.0, 1.0);
     
     //diffuse
     vec3 diffuse = dot(frag.normal, lightDir) * frag.color * light.color;
     
     //specular
-    vec3 reflectDir = normalize(reflect(-lightDir, frag.normal));
-    vec3 specular =  pow(max(dot(viewDir, reflectDir), 0.0), 32) * light.color * frag.color * frag.specular;
+    vec3 halfway = normalize(lightDir + viewDir);
+    vec3 specular = pow(max(dot(frag.normal, halfway), 0.0), 16.0) * light.color * frag.color * frag.specular;
+//    vec3 reflectDir = normalize(reflect(-lightDir, frag.normal));
+//    vec3 specular =  pow(max(dot(viewDir, reflectDir), 0.0), 32) * light.color * frag.color * frag.specular;
     
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
     
     vec3 ambient = defaultAmbient * light.color * frag.color;
     
-    return (diffuse + specular + ambient) * attenuation;
+    return (diffuse + specular + ambient) * attenuation * falloff;
     
 }
 

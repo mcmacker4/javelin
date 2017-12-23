@@ -27,6 +27,7 @@ class Javelin : Application() {
             for(j in 0..5) {
                 val anvil = GameObject(Mesh(vao), Material(albedoMap = anvilAlbedo, normalMap = anvilNormal, metallic = 1f, roughnessMap = anvilRoughness))
                 anvil.position.set(i.toFloat() * 8 - (6*8/2f), 0f, j.toFloat() * 8 - (5*8/2f))
+                anvil.rotation.y = (Math.random() * Math.PI * 2).toFloat()
                 world.addGameObject(anvil)
             }
         }
@@ -41,39 +42,31 @@ class Javelin : Application() {
         plane.position.set(0f, 0f, 0f)
         plane.scale.set(16f * 4)
         world.addGameObject(plane)
-
-//        val light = GameObject(PointLight(Color.hex(0x00bbff), 1f, 0.022f, 0.0019f))
-//        //light.position.set(3f, 8f, 6f)
-//        light.position.set(-8f, 15f, -15f)
-//        world.addGameObject(light)
-//        
-        val light2 = GameObject(SpotLight(
+        
+        val spotLight = GameObject(SpotLight(
                 Color.hex(0xffe989),
                 1f, 0.022f,
                 0.0019f,
                 toRadians(120.0).toFloat()
-        ), Test())
-        //light2.position.set(-8f, 15f, -15f)
-        light2.position.set(0f, 5f, 0f)
-        light2.rotation.set(-Math.PI.toFloat() / 4, 0f, 0f)
-        world.addGameObject(light2)
+        ))
+        spotLight.position.set(-10f, 10f, 10f)
+        spotLight.rotation.set(-Math.PI.toFloat() / 4, -Math.PI.toFloat() / 4, 0f)
+        world.addGameObject(spotLight)
         
         for(i in 0 until 2) {
             for(j in 0 until 2) {
-                val light = GameObject(PointLight(
+                val pointLight = GameObject(PointLight(
                         Vector3f(random().toFloat() * 0.5f + 0.5f, random().toFloat() * 0.5f + 0.5f, random().toFloat() * 0.5f + 0.5f),
                         1f, 0.045f,	0.0075f))
-                light.position.set(i.toFloat() * 30 - 30, 15f, j.toFloat() * 30 - 30)
-                world.addGameObject(light)
+                pointLight.position.set(i.toFloat() * 30 - 30, 15f, j.toFloat() * 30 - 30)
+                world.addGameObject(pointLight)
             }
         }
 
         //Create camera GameObject
         val camera = GameObject(Camera(), CameraControl())
-        camera.position.set(light2.position)
-        camera.rotation.set(light2.rotation)
-//        camera.position.set(-2f, 3.5f, 3f)
-//        camera.rotation.set(-0.622f, -0.41f, 0f)
+        camera.position.set(-2f, 3.5f, 3f)
+        camera.rotation.set(-0.622f, -0.41f, 0f)
         world.setActiveCamera(camera)
         
     }

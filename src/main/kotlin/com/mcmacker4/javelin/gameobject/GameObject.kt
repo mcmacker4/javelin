@@ -33,10 +33,10 @@ open class GameObject(vararg components: Component) {
     internal fun updateMatrix() {
         modelMatrix.identity()
                 .scale(scale)
+                .translate(position)
                 .rotateX(rotation.x)
                 .rotateY(rotation.y)
                 .rotateZ(rotation.z)
-                .translate(position)
     }
     
 }
