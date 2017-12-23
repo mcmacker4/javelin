@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
 import org.lwjgl.opengl.GL30.*
 
 
-class FrameBuffer : GLObject() {
+class GLFrameBuffer : GLObject() {
     
     override val id: Int = glGenFramebuffers()
 

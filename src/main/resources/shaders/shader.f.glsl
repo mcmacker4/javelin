@@ -107,7 +107,7 @@ vec3 calculatePointLight(PointLight light, vec3 color, vec3 normal, vec3 viewDir
     vec3 diffuse = light.color * max(dot(normal, lightDir), 0.0) * color;
     vec3 specular = light.color * pow(max(dot(viewDir, reflectDir), 0.0), 32) * color * (1 - roughness);
     
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 calculateSpotLight(SpotLight light, vec3 color, vec3 normal, vec3 viewDir, float roughness) {

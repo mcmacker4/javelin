@@ -53,7 +53,9 @@ object ModelLoader {
     fun loadRenderQuad() : VertexArrayObject {
         val indicesAttribute = VertexBufferObject(toIntBuffer(planeIndices), GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
         val verticesAttribute = VertexAttribute(toFloatBuffer(planeVertices), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 3)
-        val texCoordsAttribute = VertexAttribute(toFloatBuffer(texCoords), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 2)
+        val texCoordsAttribute = VertexAttribute(toFloatBuffer(
+                texCoords.mapIndexed { i, v -> if(i % 2 == 0) v else 1f - v }.toFloatArray() //Invert V coordinates
+        ), GL_ARRAY_BUFFER, GL_STATIC_DRAW, 2)
         return VertexArrayObject(indicesAttribute, hashMapOf(
                 Pair(VertexAttribute.ATTRIB_POSITION, verticesAttribute),
                 Pair(VertexAttribute.ATTRIB_TEXTURE_COORD, texCoordsAttribute)
@@ -230,10 +232,10 @@ object ModelLoader {
     )
 
     private val texCoords = floatArrayOf(
-            0f, 1f,
             0f, 0f,
-            1f, 0f,
-            1f, 1f
+            0f, 1f,
+            1f, 1f,
+            1f, 0f
     )
     
     private val tangents = floatArrayOf(

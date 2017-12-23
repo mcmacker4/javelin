@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW.*
 class CameraControl : Script() {
     
     private val direction = Vector3f()
-    private val speed = 3f
+    private val speed = 10f
     private val sensitivity = 0.005f
     
     init {

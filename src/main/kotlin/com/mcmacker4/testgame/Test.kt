@@ -6,11 +6,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class CirclePath : Script() {
+class Test : Script() {
 
     override fun update(delta: Float) {
-        val time = glfwGetTime().toFloat()
-        parent.position.set(sin(time) * 3f, cos(time) * 3f, 3f)
+        parent.rotation.y += 1f * delta
+        parent.position.x = sin(glfwGetTime()).toFloat() * 10f
     }
     
 }

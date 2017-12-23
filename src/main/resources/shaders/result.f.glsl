@@ -21,7 +21,7 @@ struct PointLight {
     float   linear;
     float   quadratic;
 };
-uniform PointLight pointLights[10];
+uniform PointLight pointLights[32];
 uniform int pointLightCount;
 
 struct SpotLight {
@@ -34,8 +34,11 @@ struct SpotLight {
     
     vec3 direction;
     float angle;
+    
+    mat4 matrix;
+    sampler2D shadowMap;
 };
-uniform SpotLight spotLights[10];
+uniform SpotLight spotLights[32];
 uniform int spotLightCount;
 
 //Constants
@@ -49,7 +52,7 @@ struct Fragment {
 } frag;
 
 float angleToDotValue(float angle) {
-    return -(angle / PI * 2 - 1);
+    return cos(angle);
 }
 
 vec3 calculatePointLight(PointLight light, Fragment frag, vec3 viewDir) {
@@ -68,17 +71,31 @@ vec3 calculatePointLight(PointLight light, Fragment frag, vec3 viewDir) {
     
     vec3 ambient = defaultAmbient * light.color * frag.color;
     
-    return (diffuse + specular + ambient);
+    return (diffuse + specular + ambient) * attenuation;
 }
 
 vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
     
     vec3 lightDir = normalize(light.position - frag.position); //Points to light
     
-    if(dot(-lightDir, light.direction) < angleToDotValue(light.angle))
+//    if(dot(-lightDir, normalize(light.direction)) < angleToDotValue(light.angle))
+//        return vec3(0.0);
+        
+    //Check if is under shadow
+    //Position to uv coordinates
+    vec4 lightSpacePos = light.matrix * vec4(frag.position, 1.0);
+    vec3 projection = lightSpacePos.xyz / lightSpacePos.w; // [-1, 1] ?
+    //Circle
+    if(length(projection) > 1.0) return vec3(0.0);
+    //
+    projection = projection * 0.5 + 0.5;
+    //Get depth
+    float rayDepth = texture(light.shadowMap, projection.xy).r;
+    float dist = length(light.position - frag.position);
+    //Compare depth
+    if(projection.z - 0.001 > rayDepth)
         return vec3(0.0);
     
-    float dist = length(light.position - frag.position);
     
     //diffuse
     vec3 diffuse = dot(frag.normal, lightDir) * frag.color * light.color;
@@ -91,7 +108,7 @@ vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
     
     vec3 ambient = defaultAmbient * light.color * frag.color;
     
-    return (diffuse + specular + ambient);
+    return (diffuse + specular + ambient) * attenuation;
     
 }
 
@@ -115,5 +132,7 @@ void main() {
     }
     
     FragColor = vec4(result, 1.0);
+//    FragColor = vec4(vec3(texture(spotLights[0].shadowMap, texCoord).r) * 5 - 4, 1.0);
+//    FragColor = vec4(frag.position * 0.01, 1.0);
 
 }
