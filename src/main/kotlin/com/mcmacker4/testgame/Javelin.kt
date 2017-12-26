@@ -31,6 +31,11 @@ class Javelin : Application() {
                 world.addGameObject(anvil)
             }
         }
+        
+        val monkeyMesh = ModelLoader.loadObj("monkey")
+        val monkey = GameObject(Mesh(monkeyMesh), Material(baseColor = Vector3f(1f, 0f, 0f), metallic = 1f, roughness = 0.7f))
+        monkey.scale.set(4f)
+        world.addGameObject(monkey)
 
         val brickAlbedo = GLTexture2D(Resources.loadImageData("textures/brickwall.png"), 4)
         val brickNormal = GLTexture2D(Resources.loadImageData("textures/brickwall_normal.png"), 4)
@@ -48,7 +53,7 @@ class Javelin : Application() {
                 1f, 0.022f,
                 0.0019f,
                 toRadians(120.0).toFloat()
-        ))
+        ), Test())
         spotLight.position.set(-10f, 10f, 10f)
         spotLight.rotation.set(-Math.PI.toFloat() / 4, -Math.PI.toFloat() / 4, 0f)
         world.addGameObject(spotLight)

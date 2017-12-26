@@ -1,6 +1,7 @@
 #version 430
 
 #define PI 3.14159265359
+#define E 2.71828
 
 in vec2 texCoord;
 
@@ -94,10 +95,12 @@ vec3 calculateSpotLight(SpotLight light, Fragment frag, vec3 viewDir) {
     float rayDepth = texture(light.shadowMap, projection.xy).r;
     float dist = length(light.position - frag.position);
     //Compare depth
-    if(projection.z - 0.001 > rayDepth)
+    if(projection.z - 0.005 > rayDepth)
         return vec3(0.0);
     
-    float falloff = clamp(1 - (len - 0.9) * 10, 0.0, 1.0);
+//    float falloff = clamp(1 - (len - 0.9) * 10, 0.0, 1.0); // Linear falloff
+    float falloff = -1 / (1 + pow(E, -100 * (len - 0.93))) + 1; //Logistic falloff
+//    if(len > 1) falloff = 0.0;
     
     //diffuse
     vec3 diffuse = dot(frag.normal, lightDir) * frag.color * light.color;

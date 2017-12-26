@@ -22,6 +22,8 @@ class Display(
     
     private val resizeListeners: ArrayList<(Int, Int) -> Unit> = arrayListOf()
     
+    private var focused = true
+    
     init {
         
         //Set Properties
@@ -64,6 +66,10 @@ class Display(
                 resizeListeners.forEach { it(width, height) }
             }
             
+            glfwSetWindowFocusCallback(window) { _, focused ->
+                this.focused = focused
+            }
+            
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
             
             glfwSetCursorPos(window, width / 2.0, height / 2.0)
@@ -83,6 +89,7 @@ class Display(
     }
     
     fun update() {
+        while(!focused){ glfwPollEvents() }
         glfwSwapBuffers(window)
     }
     
